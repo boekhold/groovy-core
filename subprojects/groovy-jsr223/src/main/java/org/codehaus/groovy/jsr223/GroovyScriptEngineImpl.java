@@ -39,42 +39,19 @@
  */
 package org.codehaus.groovy.jsr223;
 
-import groovy.lang.Binding;
-import groovy.lang.Closure;
-import groovy.lang.DelegatingMetaClass;
-import groovy.lang.GroovyClassLoader;
-import groovy.lang.MetaClass;
-import groovy.lang.MissingMethodException;
-import groovy.lang.MissingPropertyException;
-import groovy.lang.Script;
-import groovy.lang.Tuple;
-
+import groovy.lang.*;
 import org.codehaus.groovy.control.CompilationFailedException;
 import org.codehaus.groovy.control.CompilerConfiguration;
-import org.codehaus.groovy.syntax.SyntaxException;
-import org.codehaus.groovy.util.ManagedConcurrentValueMap;
-import org.codehaus.groovy.util.ReferenceBundle;
+import org.codehaus.groovy.control.customizers.ImportCustomizer;
 import org.codehaus.groovy.runtime.InvokerHelper;
 import org.codehaus.groovy.runtime.MetaClassHelper;
 import org.codehaus.groovy.runtime.MethodClosure;
+import org.codehaus.groovy.syntax.SyntaxException;
+import org.codehaus.groovy.util.ManagedConcurrentValueMap;
+import org.codehaus.groovy.util.ReferenceBundle;
 
-import javax.script.AbstractScriptEngine;
-import javax.script.Bindings;
-import javax.script.Compilable;
-import javax.script.CompiledScript;
-import javax.script.Invocable;
-import javax.script.ScriptContext;
-import javax.script.ScriptEngineFactory;
-import javax.script.ScriptException;
-import javax.script.SimpleBindings;
-
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.Writer;
-
-import java.lang.Class;
-import java.lang.String;
+import javax.script.*;
+import java.io.*;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -89,6 +66,7 @@ import java.lang.reflect.Proxy;
 public class GroovyScriptEngineImpl
         extends AbstractScriptEngine implements Compilable, Invocable {
 
+    private static final String COMPILER_CONFIG_SYSTEM_PROPERTY = "groovy.jsr223.compiler.configurator";
     private static boolean debug = false;
 
     // script-string-to-generated Class map
@@ -109,7 +87,32 @@ public class GroovyScriptEngineImpl
     }
 
     public GroovyScriptEngineImpl() {
-        this(new GroovyClassLoader(getParentLoader(), new CompilerConfiguration()));
+        CompilerConfiguration compilerConfig = new CompilerConfiguration();
+
+        String configFileName = System.getProperty(COMPILER_CONFIG_SYSTEM_PROPERTY);
+        if (configFileName != null && !"".equals(configFileName)) {
+            File conffile = new File(configFileName);
+            Binding binding = new Binding();
+            binding.setVariable("configuration", compilerConfig);
+
+            CompilerConfiguration shellCompilerConfiguration = new CompilerConfiguration();
+            ImportCustomizer importCustomizer = new ImportCustomizer();
+            importCustomizer
+                    .addStaticStars("org.codehaus.groovy.control.customizers.builder.CompilerCustomizationBuilder");
+            shellCompilerConfiguration.addCompilationCustomizers(importCustomizer);
+
+            GroovyShell shell = new GroovyShell(binding, shellCompilerConfiguration);
+
+            try {
+                // execute the compiler configuration file
+                shell.evaluate(conffile);
+            } catch (Exception e) {
+                throw new IllegalArgumentException(
+                        "error evaluating groovy compiler configuration customizer script", e);
+            }
+        }
+
+        this.loader = new GroovyClassLoader(getParentLoader(), compilerConfig);
     }
 
     public GroovyScriptEngineImpl(GroovyClassLoader classLoader) {
