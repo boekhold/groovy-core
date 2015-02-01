@@ -15,12 +15,7 @@
  */
 package org.codehaus.groovy.jsr223
 
-import javax.script.ScriptEngineManager
-import javax.script.ScriptEngine
-import javax.script.ScriptEngineFactory
-import javax.script.ScriptException
-
-import javax.script.SimpleScriptContext
+import javax.script.*
 
 /**
  * Tests JSR-223 Groovy engine implementation.
@@ -147,5 +142,60 @@ class JSR223Test extends GroovyTestCase {
         assert instance
 
         assert instance.class.isAssignableFrom(clazz)
+    }
+
+    /**
+     * Test compiler configuration customization enabled through system property
+     */
+    void testCompilerCustomizer() {
+        System.setProperty("groovy.jsr223.compiler.configurator",
+                "subprojects/groovy-jsr223/src/test/resources/importCustomizer.groovy")
+        def manager = new ScriptEngineManager()
+        def engine = manager.getEngineByName('groovy')
+        // reset the system property now in case we have an exception somewhere and this sticks
+        System.clearProperty("groovy.jsr223.compiler.configurator")
+
+        def ctx = new SimpleScriptContext()
+
+        def result = engine.eval('return XML_NS_URI', ctx)
+
+        assert result == javax.xml.XMLConstants.XML_NS_URI,
+                "'http://www.w3.org/XML/1998/namespace' should have been returned"
+    }
+
+    /**
+     * Failure case for compiler configuration customization, wrong path to config file
+     */
+    void testCompilerCustomizationWrongFilePath() {
+        System.setProperty("groovy.jsr223.compiler.configurator",
+                "subprojects/groovy-jsr223/src/test/resources/DOESNOTEXIST.groovy")
+        println System.getProperty("groovy.jsr223.compiler.configurator")
+        def manager = new ScriptEngineManager()
+
+        def engine = manager.getEngineByName('groovy')
+
+        // reset the system property now in case we have an exception somewhere and this sticks
+        System.clearProperty("groovy.jsr223.compiler.configurator")
+
+        assert engine == null, "engine creation should have failed"
+    }
+
+    /**
+     * Failure case for doing something in the script that was not enabled by
+     * the compiler configuration customizer
+     */
+    void testCompilerCustomizationWrongScript() {
+        System.setProperty("groovy.jsr223.compiler.configurator",
+                "subprojects/groovy-jsr223/src/test/resources/importCustomizer.groovy")
+        def manager = new ScriptEngineManager()
+        def engine = manager.getEngineByName('groovy')
+        // reset the system property now in case we have an exception somewhere and this sticks
+        System.clearProperty("groovy.jsr223.compiler.configurator")
+
+        def ctx = new SimpleScriptContext()
+
+        shouldFail(ScriptException) {
+            def result = engine.eval('return RELAXNG_NS_URI', ctx)
+        }
     }
 }
