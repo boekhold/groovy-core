@@ -87,8 +87,8 @@ import java.lang.reflect.Proxy;
 public class GroovyScriptEngineImpl
         extends AbstractScriptEngine implements Compilable, Invocable {
 
-    private static final String COMPILER_CONFIG_SYSTEM_PROPERTY = "groovy.jsr223.compiler.configurator";
-    private static final String BASE_SCRIPT_SYSTEM_PROPERTY = "groovy.jsr223.base.script";
+    public static final String COMPILER_CONFIG_SYSTEM_PROPERTY = "groovy.jsr223.option.configscript";
+    public static final String BASE_SCRIPT_SYSTEM_PROPERTY = "groovy.jsr223.option.basescript";
     private static boolean debug = false;
 
     // script-string-to-generated Class map

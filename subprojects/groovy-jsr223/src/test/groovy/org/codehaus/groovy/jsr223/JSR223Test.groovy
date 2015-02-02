@@ -148,12 +148,12 @@ class JSR223Test extends GroovyTestCase {
      * Test compiler configuration customization enabled through system property
      */
     void testCompilerCustomizer() {
-        System.setProperty("groovy.jsr223.compiler.configurator",
+        System.setProperty("groovy.jsr223.option.configscript",
                 "subprojects/groovy-jsr223/src/test/resources/importCustomizer.groovy")
         def manager = new ScriptEngineManager()
         def engine = manager.getEngineByName('groovy')
         // reset the system property now in case we have an exception somewhere and this sticks
-        System.clearProperty("groovy.jsr223.compiler.configurator")
+        System.clearProperty("groovy.jsr223.option.configscript")
 
         def ctx = new SimpleScriptContext()
 
@@ -167,15 +167,14 @@ class JSR223Test extends GroovyTestCase {
      * Failure case for compiler configuration customization, wrong path to config file
      */
     void testCompilerCustomizationWrongFilePath() {
-        System.setProperty("groovy.jsr223.compiler.configurator",
+        System.setProperty(GroovyScriptEngineImpl.COMPILER_CONFIG_SYSTEM_PROPERTY,
                 "subprojects/groovy-jsr223/src/test/resources/DOESNOTEXIST.groovy")
-        println System.getProperty("groovy.jsr223.compiler.configurator")
         def manager = new ScriptEngineManager()
 
         def engine = manager.getEngineByName('groovy')
 
         // reset the system property now in case we have an exception somewhere and this sticks
-        System.clearProperty("groovy.jsr223.compiler.configurator")
+        System.clearProperty(GroovyScriptEngineImpl.COMPILER_CONFIG_SYSTEM_PROPERTY)
 
         assert engine == null, "engine creation should have failed"
     }
@@ -185,12 +184,12 @@ class JSR223Test extends GroovyTestCase {
      * the compiler configuration customizer
      */
     void testCompilerCustomizationWrongScript() {
-        System.setProperty("groovy.jsr223.compiler.configurator",
+        System.setProperty(GroovyScriptEngineImpl.COMPILER_CONFIG_SYSTEM_PROPERTY,
                 "subprojects/groovy-jsr223/src/test/resources/importCustomizer.groovy")
         def manager = new ScriptEngineManager()
         def engine = manager.getEngineByName('groovy')
         // reset the system property now in case we have an exception somewhere and this sticks
-        System.clearProperty("groovy.jsr223.compiler.configurator")
+        System.clearProperty(GroovyScriptEngineImpl.COMPILER_CONFIG_SYSTEM_PROPERTY)
 
         def ctx = new SimpleScriptContext()
 
@@ -200,12 +199,12 @@ class JSR223Test extends GroovyTestCase {
     }
 
     void testBaseScriptOK() {
-        System.setProperty("groovy.jsr223.base.script",
+        System.setProperty(GroovyScriptEngineImpl.BASE_SCRIPT_SYSTEM_PROPERTY,
                 "org.codehaus.groovy.jsr223.BaseScript")
         def manager = new ScriptEngineManager()
         def engine = manager.getEngineByName('groovy')
         // reset the system property now in case we have an exception somewhere and this sticks
-        System.clearProperty("groovy.jsr223.base.script")
+        System.clearProperty(GroovyScriptEngineImpl.BASE_SCRIPT_SYSTEM_PROPERTY)
 
         def ctx = new SimpleScriptContext()
 
@@ -216,12 +215,12 @@ class JSR223Test extends GroovyTestCase {
     }
 
     void testBaseScriptWrongName() {
-        System.setProperty("groovy.jsr223.base.script",
+        System.setProperty(GroovyScriptEngineImpl.BASE_SCRIPT_SYSTEM_PROPERTY,
                 "org.codehaus.groovy.jsr223.DOESNOTEXIST")
         def manager = new ScriptEngineManager()
         def engine = manager.getEngineByName('groovy')
         // reset the system property now in case we have an exception somewhere and this sticks
-        System.clearProperty("groovy.jsr223.base.script")
+        System.clearProperty(GroovyScriptEngineImpl.BASE_SCRIPT_SYSTEM_PROPERTY)
 
         def ctx = new SimpleScriptContext()
 

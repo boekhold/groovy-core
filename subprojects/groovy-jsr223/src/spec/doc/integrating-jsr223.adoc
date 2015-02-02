@@ -1,10 +1,14 @@
 [[jsr223]]
 = JSR 223 javax.script API (TBD)
 
+== About JSR-223
+
 WARNING: JSR-223 is a standard API for calling scripting frameworks in Java. It is available since Java 6 and aims at
 providing a common framework for calling multiple languages from Java. Groovy provides its own richer integration mechanisms,
-and if you don't plan to use multiple languages in the same application, it is recommanded that you use the Groovy
+and if you don't plan to use multiple languages in the same application, it is recommended that you use the Groovy
 integration mechanisms instead of the limited JSR-223 API.
+
+== How to use the JSR-223 API to execute Groovy scripts from Java
 
 Here is how you need to initialize the JSR-223 engine to talk to Groovy from Java:
 
@@ -47,11 +51,11 @@ other string will cause the use of hard references.
 
 == Controlling the behavior of the Groovy Compiler
 
-There are 2 System properties that can be used to control how the Groovy ScriptEngine compiles your files:
+There are 2 system properties that can be used to control how the Groovy ScriptEngine compiles your files:
 
-- `groovy.jsr223.compiler.customizer`:: this option takes as argument the name of a file that uses a
-  `CompilerCustomizationBuilder` to control the behavior of the Groovy compiler.
-- `groovy.jsr223.base.script`:: this option takes as argument the fully-qualified name of a *class* (which
-  needs to be accessible on the classpath), which will be used as the *base script* of compiled scripts. The
-  class specified must `extend groovy.lang.Script`, and can optionally be `abstract`. If the class is **not**
-  abstract, it **must** implement the `public void run()` method.
+`groovy.jsr223.option.configscript`:: this option takes as argument the name of a file that uses a
+`CompilerCustomizationBuilder` to control the behavior of the Groovy compiler.
+`groovy.jsr223.option.basescript`:: this option takes as argument the fully-qualified name of a *class* (which
+needs to be accessible on the classpath), which will be used as the *base script* of compiled scripts. The
+class specified must `extend groovy.lang.Script`, and can optionally be `abstract`. If the class is **not**
+abstract, it **must** implement the `public void run()` method.
