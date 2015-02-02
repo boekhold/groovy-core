@@ -88,6 +88,7 @@ public class GroovyScriptEngineImpl
         extends AbstractScriptEngine implements Compilable, Invocable {
 
     private static final String COMPILER_CONFIG_SYSTEM_PROPERTY = "groovy.jsr223.compiler.configurator";
+    private static final String BASE_SCRIPT_SYSTEM_PROPERTY = "groovy.jsr223.base.script";
     private static boolean debug = false;
 
     // script-string-to-generated Class map
@@ -131,6 +132,11 @@ public class GroovyScriptEngineImpl
                 throw new IllegalArgumentException(
                         "error evaluating groovy compiler configuration customizer script", e);
             }
+        }
+
+        String baseScript = System.getProperty(BASE_SCRIPT_SYSTEM_PROPERTY);
+        if (baseScript != null && !"".equals(baseScript)) {
+            compilerConfig.setScriptBaseClass(baseScript);
         }
 
         this.loader = new GroovyClassLoader(getParentLoader(), compilerConfig);

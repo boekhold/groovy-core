@@ -45,3 +45,13 @@ String being `phantom` to use phantom references, `weak` to use weak
 references or `soft` to use soft references - casing is ignored. Any
 other string will cause the use of hard references.
 
+== Controlling the behavior of the Groovy Compiler
+
+There are 2 System properties that can be used to control how the Groovy ScriptEngine compiles your files:
+
+- `groovy.jsr223.compiler.customizer`:: this option takes as argument the name of a file that uses a
+  `CompilerCustomizationBuilder` to control the behavior of the Groovy compiler.
+- `groovy.jsr223.base.script`:: this option takes as argument the fully-qualified name of a *class* (which
+  needs to be accessible on the classpath), which will be used as the *base script* of compiled scripts. The
+  class specified must `extend groovy.lang.Script`, and can optionally be `abstract`. If the class is **not**
+  abstract, it **must** implement the `public void run()` method.

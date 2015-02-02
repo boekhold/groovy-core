@@ -198,4 +198,35 @@ class JSR223Test extends GroovyTestCase {
             def result = engine.eval('return RELAXNG_NS_URI', ctx)
         }
     }
+
+    void testBaseScriptOK() {
+        System.setProperty("groovy.jsr223.base.script",
+                "org.codehaus.groovy.jsr223.BaseScript")
+        def manager = new ScriptEngineManager()
+        def engine = manager.getEngineByName('groovy')
+        // reset the system property now in case we have an exception somewhere and this sticks
+        System.clearProperty("groovy.jsr223.base.script")
+
+        def ctx = new SimpleScriptContext()
+
+        def result = engine.eval('return baseMethod()', ctx)
+
+        assert result == 42,
+                "'42' should have been returned"
+    }
+
+    void testBaseScriptWrongName() {
+        System.setProperty("groovy.jsr223.base.script",
+                "org.codehaus.groovy.jsr223.DOESNOTEXIST")
+        def manager = new ScriptEngineManager()
+        def engine = manager.getEngineByName('groovy')
+        // reset the system property now in case we have an exception somewhere and this sticks
+        System.clearProperty("groovy.jsr223.base.script")
+
+        def ctx = new SimpleScriptContext()
+
+        shouldFail(ScriptException) {
+            def result = engine.eval('return baseMethod()', ctx)
+        }
+    }
 }
